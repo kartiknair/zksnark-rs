@@ -10,7 +10,7 @@ license = "GPL-3.0-or-later"
 repository = "https://github.com/republicprotocol/zksnark-rs"
 
 [dependencies]
-itertools = "0.6.0"
+itertools = "0.10"
 rand = "0.4"
 bn = "0.4.3"
 bigint = "4.4.0"
