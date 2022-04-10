@@ -121,9 +121,6 @@
 #[macro_use]
 extern crate itertools;
 
-#[macro_use]
-extern crate crunchy;
-
 mod encryption;
 pub mod field;
 pub mod groth16;

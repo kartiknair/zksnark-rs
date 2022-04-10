@@ -1249,60 +1249,50 @@ where
             let mut array: [Word64; 5] = [Word64::default(); 5];
 
             // Theta
-            unroll! {
-                for x in 0..5 {
-                    unroll! {
-                        for y_count in 0..5 {
-                            let y = y_count * 5;
-                            array[x] = self.u64_bitwise_op(&array[x], &a[x + y], Circuit::new_xor);
-                        }
-                    }
+            for x in 0..5 {
+                for y_count in 0..5 {
+                    let y = y_count * 5;
+                    array[x] = self.u64_bitwise_op(&array[x], &a[x + y], Circuit::new_xor);
                 }
             }
 
-            unroll! {
-                for x in 0..5 {
-                    unroll! {
-                        for y_count in 0..5 {
-                            let y = y_count * 5;
-                            a[y + x] = self.u64_fan_in([a[y + x], array[(x + 4) % 5],
-                                types::rotate_word64_left(array[(x + 1) % 5], 1)].iter(), Circuit::new_xor);
-                        }
-                    }
+            for x in 0..5 {
+                for y_count in 0..5 {
+                    let y = y_count * 5;
+                    a[y + x] = self.u64_fan_in(
+                        [
+                            a[y + x],
+                            array[(x + 4) % 5],
+                            types::rotate_word64_left(array[(x + 1) % 5], 1),
+                        ]
+                        .iter(),
+                        Circuit::new_xor,
+                    );
                 }
             }
 
             // Rho and pi
             let mut _last = a[1];
-            unroll! {
-                for x in 0..24 {
-                    array[0] = a[types::PI[x]];
-                    a[types::PI[x]] = types::rotate_word64_left(_last, types::RHO[x]);
-                    _last = array[0];
-                }
+            for x in 0..24 {
+                array[0] = a[types::PI[x]];
+                a[types::PI[x]] = types::rotate_word64_left(_last, types::RHO[x]);
+                _last = array[0];
             }
 
             // Chi
-            unroll! {
-                for y_step in 0..5 {
-                    let y = y_step * 5;
+            for y_step in 0..5 {
+                let y = y_step * 5;
 
-                    unroll! {
-                        for x in 0..5 {
-                            array[x] = a[y + x];
-                        }
-                    }
-
-                    unroll! {
-                        for x in 0..5 {
-                            let not = self.u64_unary_op(&array[(x + 1) % 5], Circuit::new_not);
-                            let and = self.u64_bitwise_op(&not, &(array[(x + 2) % 5]), Circuit::new_and);
-                            a[y + x] = self.u64_bitwise_op(&array[x], &and, Circuit::new_xor);
-
-                        }
-                    }
+                for x in 0..5 {
+                    array[x] = a[y + x];
                 }
-            };
+
+                for x in 0..5 {
+                    let not = self.u64_unary_op(&array[(x + 1) % 5], Circuit::new_not);
+                    let and = self.u64_bitwise_op(&not, &(array[(x + 2) % 5]), Circuit::new_and);
+                    a[y + x] = self.u64_bitwise_op(&array[x], &and, Circuit::new_xor);
+                }
+            }
 
             // Iota
             let rc_num = self.const_word64(types::RC[i]);

@@ -522,27 +522,26 @@ fn keccakf_1600_theta_rotate_test() {
     let a = &mut circuit.new_keccakmatrix();
     circuit.set_keccakmatrix(a, circuit_input);
 
-    unroll! {
-        for x in 0..5 {
-            unroll! {
-                for y_count in 0..5 {
-                    let y = y_count * 5;
-                    a[y + x] = circuit.u64_fan_in([a[y + x], array[(x + 4) % 5],
-                    types::rotate_word64_left(array[(x + 1) % 5], 1)].iter(), Circuit::new_xor);
-                }
-            }
+    for x in 0..5 {
+        for y_count in 0..5 {
+            let y = y_count * 5;
+            a[y + x] = circuit.u64_fan_in(
+                [
+                    a[y + x],
+                    array[(x + 4) % 5],
+                    types::rotate_word64_left(array[(x + 1) % 5], 1),
+                ]
+                .iter(),
+                Circuit::new_xor,
+            );
         }
     }
 
     fn theta_rotate_part(a: &mut [u64; 25], array: [u64; 5]) {
-        unroll! {
-            for x in 0..5 {
-                unroll! {
-                    for y_count in 0..5 {
-                        let y = y_count * 5;
-                        a[y + x] ^= array[(x + 4) % 5] ^ array[(x + 1) % 5].rotate_left(1);
-                    }
-                }
+        for x in 0..5 {
+            for y_count in 0..5 {
+                let y = y_count * 5;
+                a[y + x] ^= array[(x + 4) % 5] ^ array[(x + 1) % 5].rotate_left(1);
             }
         }
     }
@@ -571,26 +570,25 @@ fn keccakf_1600_theta_test() {
     let mut array: [Word64; 5] = [Word64::default(); 5];
 
     // Theta
-    unroll! {
-        for x in 0..5 {
-            unroll! {
-                for y_count in 0..5 {
-                    let y = y_count * 5;
-                    array[x] = circuit.u64_bitwise_op(&array[x], &a[x + y], Circuit::new_xor);
-                }
-            }
+    for x in 0..5 {
+        for y_count in 0..5 {
+            let y = y_count * 5;
+            array[x] = circuit.u64_bitwise_op(&array[x], &a[x + y], Circuit::new_xor);
         }
     }
 
-    unroll! {
-        for x in 0..5 {
-            unroll! {
-                for y_count in 0..5 {
-                    let y = y_count * 5;
-                    a[y + x] = circuit.u64_fan_in([a[y + x], array[(x + 4) % 5],
-                    types::rotate_word64_left(array[(x + 1) % 5], 1)].iter(), Circuit::new_xor);
-                }
-            }
+    for x in 0..5 {
+        for y_count in 0..5 {
+            let y = y_count * 5;
+            a[y + x] = circuit.u64_fan_in(
+                [
+                    a[y + x],
+                    array[(x + 4) % 5],
+                    types::rotate_word64_left(array[(x + 1) % 5], 1),
+                ]
+                .iter(),
+                Circuit::new_xor,
+            );
         }
     }
 
@@ -598,25 +596,17 @@ fn keccakf_1600_theta_test() {
         let mut array: [u64; 5] = [0; 5];
 
         // Theta
-        unroll! {
-            for x in 0..5 {
-                unroll! {
-                    for y_count in 0..5 {
-                        let y = y_count * 5;
-                        array[x] ^= a[x + y];
-                    }
-                }
+        for x in 0..5 {
+            for y_count in 0..5 {
+                let y = y_count * 5;
+                array[x] ^= a[x + y];
             }
         }
 
-        unroll! {
-            for x in 0..5 {
-                unroll! {
-                    for y_count in 0..5 {
-                        let y = y_count * 5;
-                        a[y + x] ^= array[(x + 4) % 5] ^ array[(x + 1) % 5].rotate_left(1);
-                    }
-                }
+        for x in 0..5 {
+            for y_count in 0..5 {
+                let y = y_count * 5;
+                a[y + x] ^= array[(x + 4) % 5] ^ array[(x + 1) % 5].rotate_left(1);
             }
         }
     }
